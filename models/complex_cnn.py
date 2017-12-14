@@ -15,7 +15,7 @@ from keras.layers.normalization import BatchNormalization
 from keras.layers import Conv2D, MaxPooling2D
 
 
-def model():
+def build_model():
     model = Sequential()
 
     model.add(Conv2D(68, (2, 2), input_shape=(64, 64, 1)))
@@ -51,6 +51,6 @@ def model():
     model.summary()
 
     model.compile(loss='categorical_crossentropy', optimizer=Adam(),
-                  metrics=['accuracy', custom_metrics.recall, custom_metrics.precision])
+                  metrics=['accuracy', custom_metrics.calc_recall, custom_metrics.calc_precision])
 
     return model
