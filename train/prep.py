@@ -5,7 +5,7 @@ from skimage.measure import block_reduce
 
 from utils import list_all_files
 from utils.general import dump_pickle, load_pickle
-
+import augment
 
 DEFAULT_DATASET_PATH = "data/dataset.pkl"
 
@@ -42,8 +42,9 @@ def load_faces_dataset():
 
 def pickle_faces_dataset():
     X,y=load_faces_dataset()
-    dump_pickle(dict(X=X,
-                           y=y), path=DEFAULT_DATASET_PATH)
+    X_all, y_all =augment.augment_all(X,y)
+
+    dump_pickle(dict(X=X_all,y=y_all), path=DEFAULT_DATASET_PATH)
 
 def unpickle_faces_dataset():
     dataset=load_pickle(DEFAULT_DATASET_PATH)
@@ -70,5 +71,4 @@ def prepare_data(X, y):
     return X, y, y_orig, class_weight
 
 if __name__ == "__main__":
-    # load_faces_dataset()
     pickle_faces_dataset()
