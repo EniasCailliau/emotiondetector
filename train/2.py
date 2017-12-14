@@ -78,7 +78,7 @@ model.fit(X_train, y_train, batch_size=30, epochs=100, verbose=1, validation_dat
           callbacks=callbacks)
 
 # loss, acc = model.evaluate(X_test, y_test, verbose=0)
-# print("Achieved test accuracy = {0}% with test loss {1}".format(acc*100, loss))
+# print("Achieved test.run accuracy = {0}% with test.run loss {1}".format(acc*100, loss))
 
 model.save("weights.h5")
 json_string = model.to_json()

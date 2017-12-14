@@ -30,7 +30,7 @@ class Trainer():
         test_gen = ImageDataGenerator()
         train_generator = gen.flow(self.X_train, self.Y_train, batch_size=64)
 
-        # test generator not used because of custom emtrics
+        # test.run generator not used because of custom emtrics
         test_generator = test_gen.flow(self.X_validation, self.Y_validation, batch_size=64)
 
         steps_per_epoch = int(self.X_train.shape[0] / 64)

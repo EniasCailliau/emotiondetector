@@ -2,9 +2,6 @@ import tensorflow as tf
 from keras import Sequential
 from keras.callbacks import ModelCheckpoint, CSVLogger, EarlyStopping
 from keras.layers import Conv2D, Activation, MaxPooling2D, Dense, Flatten, Dropout
-from keras.optimizers import Adam
-
-from models.extensions.custom_metrics import Metrics
 
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True

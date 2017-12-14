@@ -1,18 +1,13 @@
-import numpy as np
-from keras.models import Sequential
-import keras
-from keras.layers.core import Dense, Dropout, Flatten, Reshape
-from keras.layers.convolutional import Convolution2D, Conv2D, MaxPooling2D, AveragePooling2D
-from keras.utils import np_utils
-from keras.callbacks import ModelCheckpoint, EarlyStopping, CSVLogger
-from sklearn.utils import shuffle
-from sklearn.metrics import roc_auc_score
-from sklearn.model_selection import train_test_split
 import pickle
 
 import tensorflow as tf
+from keras.callbacks import ModelCheckpoint, EarlyStopping, CSVLogger
+from keras.layers.convolutional import Conv2D, MaxPooling2D
+from keras.layers.core import Dense, Dropout, Flatten
+from keras.models import Sequential
+from sklearn.model_selection import train_test_split
 
-import prep
+from train import prep
 
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
@@ -32,7 +27,7 @@ def load_data():
     # based on http://cs231n.stanford.edu/reports/2016/pdfs/022_Report.pdf
 
 
-X, y = prep.load_faces_dataset()
+X, y = prep.unpickle_faces_dataset()
 X, y, y_orig, class_weight = prep.prepare_data(X, y)
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
@@ -71,7 +66,7 @@ model.fit(X_train, y_train, batch_size=100, epochs=200,
           verbose=1, validation_data=(X_test, y_test), callbacks=callbacks)
 
 # loss, acc = model.evaluate(X_test, y_test, verbose=0)
-# print("Achieved test accuracy = {0}% with test loss {1}".format(acc*100, loss))
+# print("Achieved test.run accuracy = {0}% with test.run loss {1}".format(acc*100, loss))
 
 # model.save("weights.h5")
 json_string = model.to_json()

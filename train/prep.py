@@ -1,16 +1,13 @@
+import numpy as np
 from keras.utils import np_utils
+from skimage.io import imread
+from skimage.measure import block_reduce
 
 from utils import list_all_files
-import numpy as np
-from skimage.measure import block_reduce
-from skimage.io import imread
+from utils.general import dump_pickle, load_pickle
 
-negative_paths = list(list_all_files('faces/dbase/negatives/negatives7/', ['.jpg']))
-print('loaded', len(negative_paths), 'negative examples')
-positive_paths = list(list_all_files('faces/dbase/positives/positives7/', ['.jpg']))
-print('loaded', len(positive_paths), 'positive examples')
-examples = [(path, 0) for path in negative_paths] + [(path, 1) for path in positive_paths]
 
+DEFAULT_DATASET_PATH = "data/dataset.pkl"
 
 def faces_dataset(examples, block_size=1):
     X = []
@@ -24,6 +21,11 @@ def faces_dataset(examples, block_size=1):
 
 
 def load_faces_dataset():
+    negative_paths = list(list_all_files('faces/dbase/negatives/negatives7/', ['.jpg']))
+    print('loaded', len(negative_paths), 'negative examples')
+    positive_paths = list(list_all_files('faces/dbase/positives/positives7/', ['.jpg']))
+    print('loaded', len(positive_paths), 'positive examples')
+    examples = [(path, 0) for path in negative_paths] + [(path, 1) for path in positive_paths]
     X, y = faces_dataset(examples)
 
     X = X.astype(np.float32) / 255.
@@ -38,6 +40,14 @@ def load_faces_dataset():
     X = np.expand_dims(X, axis=-1)
     return X, y
 
+def pickle_faces_dataset():
+    X,y=load_faces_dataset()
+    dump_pickle(dict(X=X,
+                           y=y), path=DEFAULT_DATASET_PATH)
+
+def unpickle_faces_dataset():
+    dataset=load_pickle(DEFAULT_DATASET_PATH)
+    return dataset['X'],dataset['y']
 
 def prepare_data(X, y):
     # convert classes to vector
@@ -58,3 +68,7 @@ def prepare_data(X, y):
     print(X.dtype, X.min(), X.max(), X.shape)
     print(y.dtype, y.min(), y.max(), y.shape)
     return X, y, y_orig, class_weight
+
+if __name__ == "__main__":
+    # load_faces_dataset()
+    pickle_faces_dataset()
