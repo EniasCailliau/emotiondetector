@@ -1,0 +1,25 @@
+--run
+conv2d filters=32 kernel_size=[2,2] input_shape=[64,64,1]
+conv2d filters=32 kernel_size=[2,2]
+maxpooling2d pool_size=[2,2]
+conv2d filters=32 kernel_size=[2,2]
+conv2d filters=64 kernel_size=[4,4]
+conv2d filters=64 kernel_size=[4,4]
+maxpooling2d pool_size=[2,2]
+flatten
+batchnormalization
+dense units=512 activation=relu
+batchnormalization
+dropout rate=0.2
+dense units=2 activation=softmax
+
+
+
+
+
+
+
+
+
+
+

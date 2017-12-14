@@ -1,19 +1,31 @@
-
+import keras
+import numpy as np
 from keras import backend as K
-from sklearn.metrics import fbeta_score
+from sklearn.metrics import recall_score, precision_score, accuracy_score
 
 
-def precision_custom(y_true, y_pred):
-    # Calculates the precision
-    true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
-    predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
-    precision = true_positives / (predicted_positives + K.epsilon())
-    return precision
+class Metrics(keras.callbacks.Callback):
 
+    def __init__(self):
+        super().__init__()
+        self.recall_list = []
+        self.precision_list = []
+        self.accuracy_list = []
 
-def recall_custom(y_true, y_pred):
-    # Calculates the recall
-    true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
-    possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
-    recall = true_positives / (possible_positives + K.epsilon())
-    return recall
+    def on_epoch_end(self, batch, logs=None):
+        # TODO: Add precision recall accuracy for training set (problem because generator is used)
+        y_pred_labels = np.argmax(self.model.predict(self.validation_data[0]), axis=1)
+        y_labels = np.argmax(self.validation_data[1], axis=1)
+
+        recall = recall_score(y_labels, y_pred_labels)
+        print("- val_recall:  {}".format(recall))
+        precision = precision_score(y_labels, y_pred_labels)
+        print("- val_precision:  {}".format(precision))
+        accuracy = accuracy_score(y_labels, y_pred_labels)
+        print("- accuracy:  {}".format(accuracy))
+
+        self.recall_list.append(recall)
+        self.precision_list.append(precision)
+        self.accuracy_list.append(accuracy)
+
+        return
