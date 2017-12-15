@@ -22,7 +22,9 @@ def build_model():
     model.add(Dropout(0.25))
     model.add(Conv2D(64, (5, 5)))
     model.add(Activation('relu'))
+
     model.add(MaxPooling2D(pool_size=(2, 2)))
+
     model.add(Dropout(0.25))
     model.add(Conv2D(128, (3, 3)))
     model.add(Activation('relu'))

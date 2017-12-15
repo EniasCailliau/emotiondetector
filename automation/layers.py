@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-from keras.layers import Conv2D, Activation, MaxPooling2D, Dense, Flatten, Dropout,AveragePooling2D,BatchNormalization
+from keras.layers import Conv2D, Activation, MaxPooling2D, Dense, Flatten, Dropout,AveragePooling2D,BatchNormalization,Activation
 
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
@@ -166,6 +166,10 @@ class BatchNormalization_layer(object):
     def __str__(self):
         return "BatchNormalization"
 
+
+
+
+
 class LayerFactory(object):
     layer_classes = {
         'conv2d': Conv2D_layer,
@@ -174,7 +178,9 @@ class LayerFactory(object):
         'averagepooling2d': AveragePooling2D_layer,
         'dropout': Dropout_layer,
         'flatten': Flatten_layer,
-        'batchnormalization':BatchNormalization_layer
+        'batchnormalization':BatchNormalization_layer,
+        'activation': Activation_layer,
+
     }
 
     def new_from_string(self, creation_string):

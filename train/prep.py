@@ -5,7 +5,7 @@ from skimage.measure import block_reduce
 
 from utils import list_all_files
 from utils.general import dump_pickle, load_pickle
-import augment
+from train import augment
 
 DEFAULT_DATASET_PATH = "data/dataset.pkl"
 
@@ -21,9 +21,9 @@ def faces_dataset(examples, block_size=1):
 
 
 def load_faces_dataset():
-    negative_paths = list(list_all_files('faces/dbase/negatives/negatives7/', ['.jpg']))
+    negative_paths = list(list_all_files('../faces/dbase/negatives/negatives7/', ['.jpg']))
     print('loaded', len(negative_paths), 'negative examples')
-    positive_paths = list(list_all_files('faces/dbase/positives/positives7/', ['.jpg']))
+    positive_paths = list(list_all_files('../faces/dbase/positives/positives7/', ['.jpg']))
     print('loaded', len(positive_paths), 'positive examples')
     examples = [(path, 0) for path in negative_paths] + [(path, 1) for path in positive_paths]
     X, y = faces_dataset(examples)
