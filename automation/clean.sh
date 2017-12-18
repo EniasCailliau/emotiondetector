@@ -1,2 +1,2 @@
-mv done/tasks/* tasks
+mv tasks/done/* tasks
 

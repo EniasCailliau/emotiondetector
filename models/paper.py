@@ -4,7 +4,7 @@ from keras.callbacks import EarlyStopping
 from keras.layers import Conv2D, Activation, MaxPooling2D, Dense, Flatten, AveragePooling2D, Dropout
 from keras.optimizers import Adam
 
-from models.extensions.custom_metrics import Metrics
+from models.extensions.metrics import Metrics
 
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True

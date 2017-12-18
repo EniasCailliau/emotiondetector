@@ -2,113 +2,77 @@ from __future__ import print_function
 
 import logging
 import os
-import shutil
-import sys
 import time
-from io import StringIO
-from multiprocessing import Pool
 from functools import partial
+from multiprocessing import Pool
+
 from keras import Sequential
-from keras.callbacks import ModelCheckpoint, CSVLogger, EarlyStopping
-from automation.layers import LayerFactory
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
-from utils.general import generate_unqiue_file_name
+from automation.layers import LayerFactory
 from train import prep
-from models import emotion_recognition_cnn
 from train import trainer
-LOGGER = logging.getLogger()
-LOGGER.setLevel(logging.DEBUG)
-
-ch = logging.StreamHandler(sys.stdout)
-ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-ch.setFormatter(formatter)
-LOGGER.addHandler(ch)
+from utils.general import generate_unqiue_folder_name, make_dir
 
 
-def myprint(log_file,s):
-    print(s, file=log_file)
+def model_printer(log_file, s):
+    with open(log_file, 'a') as f:
+        print(s, file=f)
 
 
+def run_configuration(layers, log_folder, datasets):
+    logging.info("Running the configuration")
 
-def run_configuration(layers, log_file,task_file):
-    LOGGER.info("Running the configuration")
-    X,y = prep.load_faces_dataset()
-    X,y, y_orig, class_weight = prep.prepare_data(X, y)
+    # Build the model
     model = Sequential()
 
     for layer in layers:
-        print('   ', layer, file=log_file)
         model.add(layer.construct())
-    myprint_partial = partial(myprint,log_file)
-    model.summary(print_fn=myprint_partial)
-    model.compile(loss='binary_crossentropy',
+    model.summary(print_fn=partial(model_printer, log_folder + "summary.log"))
+    model.compile(loss='categorical_crossentropy',
                   optimizer='adam',
                   metrics=['accuracy'])
-    # Training
-    trainer_impl = trainer.Trainer(X, y, y_orig)
-    model = trainer_impl.train(model,task_file)
-    trainer_impl.evaluate(model)
-    trainer_impl.predict(model)
-    trainer_impl.export(model)
 
-    return log_file
+    for X, y, class_weight, name, setting in datasets:
+        print("Processing new dataset ({}) with dimensions:".format(name))
+        print("X: {}".format(X.shape))
+        print("y: {}".format(y.shape))
+        print("On the fly augmentation: {}".format(setting))
+        trainer_impl = trainer.Trainer(X, y, setting)
+        new_log_folder = os.path.join(log_folder, name) + "/"
+        make_dir(new_log_folder)
+        model, metrics = trainer_impl.train(model, new_log_folder)
+        trainer_impl.evaluate(model)
+        # trainer_impl.export(model, new_log_folder)
+        print("We are going to continue")
 
 
 def run_task(task_file):
-    LOGGER.info("Starting tasks {}".format(task_file))
-    path_log_file = os.path.basename(task_file)
-    log_file = generate_unqiue_file_name(path_log_file, 'log')
-    log_file = os.path.join('task_results', log_file)
+    logging.info("Starting task {}".format(task_file))
+    task_file_name = os.path.basename(task_file)
+    log_folder = generate_unqiue_folder_name(task_file_name)
+    log_folder = os.path.join('task_results', log_folder)
+    make_dir(log_folder)
     layers_fact = LayerFactory()
+
     with open(task_file, 'r') as f:
-        results = []
         layers = []
         for line in f:
-            if line.startswith('--run'):
-                if len(layers) == 0:
-                    continue
-                try:
-                    string_logger = StringIO()
-                    results.append(worker_pool.apply_async(run_configuration, (layers, string_logger,log_file)))
-                except Exception as e:
-                    logging.exception(e)
-                    layers = []
-            elif line.startswith('#'):
-                # skip comments
+            if line.startswith('#'):
                 continue
             elif line.strip():
-                # assume that a non blank line is a feature extractor
                 layers.append(layers_fact.new_from_string(line))
-        string_logger = StringIO()
-        results.append(worker_pool.apply_async(run_configuration, (layers, string_logger,log_file)))
+        worker_pool.apply(run_configuration, (layers, log_folder, datasets))
+        logging.info("Task {} completed".format(task_file_name))
+        os.rename(task_file, os.path.join("tasks", "done", task_file_name))
 
-    with open(log_file, 'w+') as lf:
-        for result in results:
-            result.wait()
-            if result.successful():
-                string_buffer = result.get()
-                string_buffer.seek(0)
-                shutil.copyfileobj(string_buffer, lf, -1)
-                string_buffer.close()
-                lf.flush()
-                LOGGER.info('configuration written to file.')
-            else:
-                LOGGER.error("Error in configuration.")
-                try:
-                    result.get()
-                except Exception as e:
-                    LOGGER.exception(e)
-    LOGGER.info("Task {} completed".format(task_file))
-    os.rename(task_file, "done/"+task_file)
 
 class TaskDirEventHandler(FileSystemEventHandler):
     def on_created(self, event):
         if not event.is_directory and event.src_path.endswith('.run'):
             try:
-                LOGGER.info('New tasks file detected.')
+                logging.info('New tasks file detected.')
                 run_task(event.src_path)
             except Exception as e:
                 logging.exception(e)
@@ -117,8 +81,8 @@ class TaskDirEventHandler(FileSystemEventHandler):
 def monitor_task_dir(task_dir='tasks'):
     observer = Observer()
     event_handler = TaskDirEventHandler()
-    observer.schedule(event_handler, task_dir, recursive=True)
-    LOGGER.info('Starting to monitor the tasks directory')
+    observer.schedule(event_handler, task_dir, recursive=False)
+    logging.info('Starting to monitor the tasks directory')
     observer.start()
     try:
         while True:
@@ -129,6 +93,17 @@ def monitor_task_dir(task_dir='tasks'):
 
 
 if __name__ == '__main__':
+    worker_pool = Pool(1)
 
-    worker_pool = Pool(4)
+    datasets = []
+    # load the different datasets
+    X, y = prep.unpickle_faces_dataset()
+    X, y, class_weight = prep.prepare_data(X, y)
+    datasets.append((X, y, class_weight, "augmented", False))
+
+    X, y = prep.load_faces_dataset()
+    X, y, class_weight = prep.prepare_data(X, y)
+    datasets.append((X, y, class_weight, "non_augmented", False))
+    datasets.append((X, y, class_weight, "auto_augment", True))
+
     monitor_task_dir('tasks')

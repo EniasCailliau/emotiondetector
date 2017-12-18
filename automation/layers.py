@@ -1,13 +1,15 @@
 import tensorflow as tf
 
-from keras.layers import Conv2D, Activation, MaxPooling2D, Dense, Flatten, Dropout,AveragePooling2D,BatchNormalization,Activation
+from keras.layers import Conv2D, Activation, MaxPooling2D, Dense, Flatten, Dropout, AveragePooling2D, \
+    BatchNormalization, Activation
 
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 
-class Dropout_layer(object):
+
+class DropoutLayer(object):
     def __init__(self, rate=0.25):
-        self.rate=rate
+        self.rate = rate
 
     def construct(self):
         return Dropout(rate=self.rate)
@@ -25,21 +27,18 @@ class Dropout_layer(object):
         return "Dropout, rate={}".format(self.rate)
 
 
-class Conv2D_layer(object):
+class Conv2dLayer(object):
     def __init__(self, filters=32, kernel_size=(3, 3),
                  activation='relu',
                  input_shape=None):
-        self.filters=filters
-        self.kernel_size=kernel_size
-        self.activation=activation
-        self.input_shape=input_shape
+        self.filters = filters
+        self.kernel_size = kernel_size
+        self.input_shape = input_shape
 
     def construct(self):
-        if self.input_shape :
-            return Conv2D(self.filters, kernel_size=self.kernel_size,
-                   activation=self.activation, input_shape=self.input_shape)
-        return Conv2D(self.filters, kernel_size=self.kernel_size,
-                   activation=self.activation)
+        if self.input_shape:
+            return Conv2D(self.filters, kernel_size=self.kernel_size, input_shape=self.input_shape)
+        return Conv2D(self.filters, kernel_size=self.kernel_size)
 
     @classmethod
     def parse_args(cls, encoded):
@@ -50,24 +49,23 @@ class Conv2D_layer(object):
                 kwargs['filters'] = int(par_string.strip())
             elif arg.startswith('kernel_size='):
                 par_string = arg[arg.index('=') + 1:]
-                # drop the braces
                 par_array = par_string[1:-1].split(',')
-                kwargs['kernel_size'] = (int(par_array[0].strip()),int(par_array[1].strip()))
+                kwargs['kernel_size'] = (int(par_array[0].strip()), int(par_array[1].strip()))
             elif arg.startswith('input_shape='):
                 par_string = arg[arg.index('=') + 1:]
-                # drop the braces
-                print(arg.index)
                 par_array = par_string[1:-1].split(',')
-                print(par_array)
-                kwargs['input_shape'] = (int(par_array[0].strip()),int(par_array[1].strip()),int(par_array[2].strip()))
+                kwargs['input_shape'] = (
+                    int(par_array[0].strip()), int(par_array[1].strip()), int(par_array[2].strip()))
         return kwargs
 
     def __str__(self):
-        return "Conv2D_layer, filters={}, kernel_size={}, activation={}, input_shape={} ".format(self.filters,self.kernel_size,self.activation,self.input_shape)
+        return "Conv2D_layer, filters={}, kernel_size={}, input_shape={} ".format(self.filters, self.kernel_size,
+                                                                                  self.input_shape)
 
-class AveragePooling2D_layer(object):
+
+class Averagepooling2dLayer(object):
     def __init__(self, pool_size=(2, 2)):
-        self.pool_size=pool_size
+        self.pool_size = pool_size
 
     def construct(self):
         return AveragePooling2D(pool_size=self.pool_size)
@@ -79,15 +77,16 @@ class AveragePooling2D_layer(object):
             if arg.startswith('pool_size='):
                 par_string = arg[arg.index('=') + 1:]
                 par_array = par_string[1:-1].split(',')
-                kwargs['pool_size'] = (int(par_array[0].strip()),int(par_array[1].strip()))
+                kwargs['pool_size'] = (int(par_array[0].strip()), int(par_array[1].strip()))
         return kwargs
+
     def __str__(self):
         return "AveragePooling2D_layer, pool_size={}".format(self.pool_size)
 
 
-class MaxPooling2D_layer(object):
+class Maxpooling2dLayer(object):
     def __init__(self, pool_size=(2, 2)):
-        self.pool_size=pool_size
+        self.pool_size = pool_size
 
     def construct(self):
         return MaxPooling2D(pool_size=self.pool_size)
@@ -99,15 +98,16 @@ class MaxPooling2D_layer(object):
             if arg.startswith('pool_size='):
                 par_string = arg[arg.index('=') + 1:]
                 par_array = par_string[1:-1].split(',')
-                kwargs['pool_size'] = (int(par_array[0].strip()),int(par_array[1].strip()))
+                kwargs['pool_size'] = (int(par_array[0].strip()), int(par_array[1].strip()))
         return kwargs
+
     def __str__(self):
         return "MaxPooling2D_layer, pool_size={}".format(self.pool_size)
 
 
-class Activation_layer(object):
+class ActivationLayer(object):
     def __init__(self, activation="relu"):
-        self.activation=activation
+        self.activation = activation
 
     def construct(self):
         return Activation(activation=self.activation)
@@ -120,16 +120,18 @@ class Activation_layer(object):
                 par_string = arg[arg.index('=') + 1:]
                 kwargs['activation'] = par_string
         return kwargs
+
     def __str__(self):
         return "Activation_layer, activation={}".format(self.activation)
 
-class Dense_layer(object):
-    def __init__(self, units=2,activation='relu'):
-        self.units=units
-        self.activation=activation
+
+class DenseLayer(object):
+
+    def __init__(self, units=2):
+        self.units = units
 
     def construct(self):
-        return Dense(units=self.units,activation=self.activation)
+        return Dense(units=self.units)
 
     @classmethod
     def parse_args(cls, encoded):
@@ -141,9 +143,10 @@ class Dense_layer(object):
         return kwargs
 
     def __str__(self):
-        return "Dense_layer, units={}, activation={}".format(self.units,self.activation)
+        return "Dense_layer, units={}".format(self.units)
 
-class Flatten_layer(object):
+
+class FlattenLayer(object):
 
     def construct(self):
         return Flatten()
@@ -151,10 +154,12 @@ class Flatten_layer(object):
     @classmethod
     def parse_args(cls, encoded):
         return {}
+
     def __str__(self):
         return "Flatten_layer"
 
-class BatchNormalization_layer(object):
+
+class BatchnormalizationLayer(object):
 
     def construct(self):
         return BatchNormalization()
@@ -167,19 +172,16 @@ class BatchNormalization_layer(object):
         return "BatchNormalization"
 
 
-
-
-
 class LayerFactory(object):
     layer_classes = {
-        'conv2d': Conv2D_layer,
-        'dense': Dense_layer,
-        'maxpooling2d': MaxPooling2D_layer,
-        'averagepooling2d': AveragePooling2D_layer,
-        'dropout': Dropout_layer,
-        'flatten': Flatten_layer,
-        'batchnormalization':BatchNormalization_layer,
-        'activation': Activation_layer,
+        'conv2d': Conv2dLayer,
+        'dense': DenseLayer,
+        'maxpooling2d': Maxpooling2dLayer,
+        'averagepooling2d': Averagepooling2dLayer,
+        'dropout': DropoutLayer,
+        'flatten': FlattenLayer,
+        'batchnormalization': BatchnormalizationLayer,
+        'activation': ActivationLayer,
 
     }
 

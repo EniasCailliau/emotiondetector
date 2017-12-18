@@ -1,7 +1,7 @@
 import tensorflow as tf
 from keras.optimizers import Adam
 
-from models.extensions import custom_metrics
+from models.extensions import metrics
 
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
@@ -51,6 +51,6 @@ def build_model():
     model.summary()
 
     model.compile(loss='categorical_crossentropy', optimizer=Adam(),
-                  metrics=['accuracy', custom_metrics.calc_recall, custom_metrics.calc_precision])
+                  metrics=['accuracy', metrics.calc_recall, metrics.calc_precision])
 
     return model
