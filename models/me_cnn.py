@@ -15,7 +15,7 @@ from keras.layers.normalization import BatchNormalization
 from keras.layers import Conv2D, MaxPooling2D
 
 
-def build_model():
+def build_model(num_filters, filter_shape):
     model = Sequential()
 
     model.add(Conv2D(64, (7, 7), input_shape=(64, 64, 1)))
@@ -30,7 +30,7 @@ def build_model():
     model.add(MaxPooling2D(pool_size=(2, 2)))
     model.add(Dropout(0.25))
 
-    model.add(Conv2D(128, (3, 3)))
+    model.add(Conv2D(num_filters, filter_shape  ))
     model.add(Activation('relu'))
 
     model.add(Conv2D(128, (3, 3)))
