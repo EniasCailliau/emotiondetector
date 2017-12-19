@@ -1,0 +1,33 @@
+conv2d filters=8 kernel_size=[3,3] input_shape=[64,64,1]
+activation activation=relu
+conv2d filters=8 kernel_size=[3,3]
+activation activation=relu
+maxpooling2d pool_size=[2,2] stride=2
+#8x32x32
+
+conv2d filters=16 kernel_size=[3,3]
+activation activation=relu
+conv2d filters=16 kernel_size=[3,3]
+activation activation=relu
+maxpooling2d pool_size=[2,2]  stride=2
+#16x16x16
+
+conv2d filters=64 kernel_size=[3,3]
+activation activation=relu
+conv2d filters=64 kernel_size=[3,3]
+activation activation=relu
+maxpooling2d pool_size=[2,2]  stride=2
+#64x8x8
+
+flatten
+dense units=1024
+activation activation=relu
+dense units=64
+activation activation=relu
+dense units=2
+activation activation=softmax
+
+
+#thesis
+
+

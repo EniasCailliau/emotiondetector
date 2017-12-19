@@ -1,0 +1,1 @@
+epoch,accuracy,loss,roc_auc,precision,recall,val_accuracy,val_loss,val_roc_auc,val_precision,val_recall

@@ -1,12 +1,10 @@
 conv2d filters=64 kernel_size=[7,7] input_shape=[64,64,1]
 activation activation=relu
-
 maxpooling2d pool_size=[2,2]
 dropout rate=0.25
 
 conv2d filters=128 kernel_size=[5,5]
 activation activation=relu
-
 maxpooling2d pool_size=[2,2]
 dropout rate=0.25
 

@@ -8,8 +8,10 @@ activation activation=relu
 batchnormalization
 maxpooling2d pool_size=[3,3] stride=2
 #
-dense units=256 activation=relu
-dense units=2 activation=softmax
+dense units=256
+activation activation=relu
+dense units=2
+activation activation=softmax
 # A CNN cascade for face detection
 
 
