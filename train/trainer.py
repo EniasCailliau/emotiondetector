@@ -4,6 +4,7 @@ from keras.preprocessing.image import ImageDataGenerator
 from tensorflow.contrib.learn.python.learn.estimators._sklearn import train_test_split
 import pandas as pd
 
+from models.extensions.early_stop import Early_stop
 from models.extensions.metrics import Metrics
 
 
@@ -31,11 +32,19 @@ class Trainer():
 
     def train(self, model, task_file):
         metrics = Metrics(self.X_train, self.Y_train, task_file)
-        early_stop_val = EarlyStopping(monitor='val_acc', min_delta=0, patience=25, verbose=1, mode='auto')
-        early_stop = EarlyStopping(monitor='acc', min_delta=0, patience=25, verbose=1, mode='auto')
+
+        # early_stop_val = EarlyStopping(monitor='val_acc', min_delta=0, patience=25, verbose=1, mode='auto')
+        # early_stop = EarlyStopping(monitor='acc', min_delta=0, patience=25, verbose=1, mode='auto')
+
         filepath = task_file + "weights-{val_acc:.5f}.h5"
+        early_stop = Early_stop(filepath=filepath)
+
+
+
         checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=0, save_best_only=True, mode='max')
-        callbacks = [early_stop_val, early_stop, checkpoint, metrics]
+
+
+        callbacks = [ early_stop, checkpoint, metrics]
 
         model.fit_generator(self.train_generator, epochs=500, verbose=1,
                             validation_data=[self.X_validation, self.Y_validation], callbacks=callbacks)
