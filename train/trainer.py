@@ -46,7 +46,7 @@ class Trainer():
 
         callbacks = [ early_stop, checkpoint, metrics]
 
-        model.fit_generator(self.train_generator, epochs=500, verbose=1,
+        model.fit_generator(self.train_generator, epochs=1, verbose=1,
                             validation_data=[self.X_validation, self.Y_validation], callbacks=callbacks)
 
         return model, metrics
@@ -59,9 +59,10 @@ class Trainer():
         print(model.metrics_names)
         return score
 
-    def evaluate(self, model):
+    def evaluate(self, model,new_log_folder):
         self.__evaluate(model, self.X_train, self.Y_train, "training")
         self.__evaluate(model, self.X_validation, self.Y_validation, "validation")
+        self.export(model,new_log_folder)
 
     def predict(self, model):
         # TODO: this needs to be reviewed
@@ -71,5 +72,5 @@ class Trainer():
         model_json = model.to_json()
         with open(os.path.join(log_folder, "model.json"), "w") as json_file:
             json_file.write(model_json)
-        model.save_weights(os.path.join(log_folder, 'final_model_weights.h5'))
+        # model.save_weights(os.path.join(log_folder, 'final_model_weights.h5'))
         print("Saved last model to disk")

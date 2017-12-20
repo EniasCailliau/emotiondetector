@@ -33,7 +33,7 @@ def run_configuration(layers, log_folder, datasets):
     model.compile(loss='categorical_crossentropy',
                   optimizer='adam',
                   metrics=['accuracy'])
-
+    print("here")
     for X, y, class_weight, name, setting in datasets:
         print("Processing new dataset ({}) with dimensions:".format(name))
         print("X: {}".format(X.shape))
@@ -43,7 +43,7 @@ def run_configuration(layers, log_folder, datasets):
         new_log_folder = os.path.join(log_folder, name) + "/"
         make_dir(new_log_folder)
         model, metrics = trainer_impl.train(model, new_log_folder)
-        trainer_impl.evaluate(model)
+        trainer_impl.evaluate(model,new_log_folder)
         # trainer_impl.export(model, new_log_folder)
         print("We are going to continue")
 
@@ -55,9 +55,10 @@ def run_task(task_file):
     log_folder = os.path.join('task_results', log_folder)
     make_dir(log_folder)
     layers_fact = LayerFactory()
-
+    print("here")
     with open(task_file, 'r') as f:
         layers = []
+        print("here")
         for line in f:
             if line.startswith('#'):
                 continue
@@ -70,6 +71,7 @@ def run_task(task_file):
 
 class TaskDirEventHandler(FileSystemEventHandler):
     def on_created(self, event):
+        print("here")
         if not event.is_directory and event.src_path.endswith('.run'):
             try:
                 logging.info('New tasks file detected.')
@@ -99,11 +101,11 @@ if __name__ == '__main__':
     # load the different datasets
     X, y = prep.unpickle_faces_dataset()
     X, y, class_weight = prep.prepare_data(X, y)
-    datasets.append((X, y, class_weight, "augmented", False))
+    # datasets.append((X, y, class_weight, "augmented", False))
 
     X, y = prep.load_faces_dataset()
     X, y, class_weight = prep.prepare_data(X, y)
     datasets.append((X, y, class_weight, "non_augmented", False))
-    datasets.append((X, y, class_weight, "auto_augment", True))
+    # datasets.append((X, y, class_weight, "auto_augment", True))
 
     monitor_task_dir('tasks')

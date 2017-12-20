@@ -26,6 +26,7 @@ def load_faces_dataset():
     dir = os.path.dirname(__file__)
     filename_neg = os.path.join(dir, '../faces/dbase/negatives/negatives7/')
     filename_pos = os.path.join(dir, '../faces/dbase/positives/positives7/')
+    print(filename_neg)
     negative_paths = list(list_all_files(filename_neg, ['.jpg']))
     print('loaded', len(negative_paths), 'negative examples')
     positive_paths = list(list_all_files(filename_pos, ['.jpg']))
@@ -38,6 +39,25 @@ def load_faces_dataset():
 
     X = np.expand_dims(X, axis=-1)
     return X, y
+
+def load_eval_faces_dataset():
+    dir = os.path.dirname(__file__)
+    filename_neg = os.path.join(dir, '../test_faces/dbase/negatives/negatives7/')
+    filename_pos = os.path.join(dir, '../test_faces/dbase/positives/positives7/')
+    print(filename_neg)
+    negative_paths = list(list_all_files(filename_neg, ['.jpg']))
+    print('loaded', len(negative_paths), 'negative examples')
+    positive_paths = list(list_all_files(filename_pos, ['.jpg']))
+    print('loaded', len(positive_paths), 'positive examples')
+    examples = [(path, 0) for path in negative_paths] + [(path, 1) for path in positive_paths]
+    X, y = faces_dataset(examples)
+
+    X = X.astype(np.float32) / 255.
+    y = y.astype(np.int32)
+
+    X = np.expand_dims(X, axis=-1)
+    return X, y
+
 
 
 def pickle_faces_dataset():
