@@ -61,13 +61,20 @@ def load_eval_faces_dataset():
 
 
 def pickle_faces_dataset():
+    """
+    Pickles the dataset to the DEFAULT_DATASET_PATH location
+    :return:
+    """
     X, y = load_faces_dataset()
-    X_all, y_all = augment.augment_all(X, y)
 
-    dump_pickle(dict(X=X_all, y=y_all), path=DEFAULT_DATASET_PATH)
+    dump_pickle(dict(X=X, y=y), path=DEFAULT_DATASET_PATH)
 
 
 def unpickle_faces_dataset():
+    """
+    Unpickles the dataset from the DEFAULT_DATASET_PATH and returns the X and Y values
+    :return:
+    """
     dataset = load_pickle(DEFAULT_DATASET_PATH)
     return dataset['X'], dataset['y']
 
