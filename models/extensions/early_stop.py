@@ -6,7 +6,7 @@ from sklearn.metrics import recall_score, precision_score, accuracy_score, roc_a
 
 
 
-class Early_stop(keras.callbacks.Callbac):
+class Early_stop(keras.callbacks.Callback):
     """Stop training when a monitored quantity has stopped improving.
 
     # Arguments
