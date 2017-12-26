@@ -15,8 +15,8 @@ def print_indicator(data, model, class_names, bar_width=50):
 
 def print_probas(data, model):
     probabilities = model.predict(np.array([data]))[0]
-    print("1:",probabilities[1] )
-    print("0:",probabilities[0] )
+    print("Smile: ",probabilities[1] )
+    print("Neutral: ",probabilities[0] )
 
 # load in the keras model trained in training.py
 
@@ -26,15 +26,15 @@ model.load_weights('weights-0.98861.h5')
 
 # X = np.load('X.npy')
 
-X,_=prep.load_eval_faces_dataset()
+X,examples=prep.load_eval_faces_dataset()
 
-# X = X.astype(np.float) / 255.
+#X = X.astype(np.float) / 255.
 class_names = ['Neutral', 'Smiling']
 print(X.shape)
 for i in range(X.shape[0]):
+    print(examples[i])
     print_indicator(X[i], model, class_names)
     print_probas(X[i], model,)
-
 
 #show_array(255 * X[-100])
 #print_indicator(X[-100], model, class_names)

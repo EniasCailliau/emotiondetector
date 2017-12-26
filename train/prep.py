@@ -56,7 +56,7 @@ def load_eval_faces_dataset():
     y = y.astype(np.int32)
 
     X = np.expand_dims(X, axis=-1)
-    return X, y
+    return X, examples
 
 
 
